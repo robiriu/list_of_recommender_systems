@@ -1,0 +1,27 @@
+name: Mirror to Personal GitHub
+
+on:
+  push:
+    branches:
+      - '**'
+  delete:
+    branches:
+      - '**'
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Mirror push
+        env:
+          MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          git remote add mirror "https://x-access-token:${MIRROR_TOKEN}@github.com/robiriu/${REPO_NAME}.git"
+          git push mirror --all --force
+          git push mirror --tags --force
